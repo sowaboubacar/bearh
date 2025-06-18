@@ -1,0 +1,276 @@
+@import url("https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 180 10% 99%;
+    --foreground: 186 33% 24%;
+    --card: 0 0% 100%;
+    --card-foreground: 186 33% 24%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 186 33% 24%;
+    --primary: 184 100% 24%;
+    --primary-foreground: 180 10% 99%;
+    --secondary: 184 39% 93%;
+    --secondary-foreground: 186 33% 24%;
+    --muted: 184 39% 93%;
+    --muted-foreground: 186 23% 40%;
+    --accent: 184 59% 85%;
+    --accent-foreground: 186 33% 24%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 180 10% 99%;
+    --border: 184 39% 88%;
+    --input: 184 39% 88%;
+    --ring: 184 100% 24%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 186 33% 6%;
+    --foreground: 180 10% 99%;
+    --card: 186 33% 10%;
+    --card-foreground: 180 10% 99%;
+    --popover: 186 33% 10%;
+    --popover-foreground: 180 10% 99%;
+    --primary: 184 100% 24%;
+    --primary-foreground: 180 10% 99%;
+    --secondary: 186 23% 16%;
+    --secondary-foreground: 180 10% 99%;
+    --muted: 186 23% 16%;
+    --muted-foreground: 184 9% 75%;
+    --accent: 186 23% 16%;
+    --accent-foreground: 180 10% 99%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 180 10% 99%;
+    --border: 186 23% 16%;
+    --input: 186 23% 16%;
+    --ring: 184 100% 24%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+body {
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.card {
+  @apply bg-card text-card-foreground shadow-md rounded-lg overflow-hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.card:hover {
+  @apply shadow-lg;
+  transform: translateY(-2px);
+}
+
+.button {
+  @apply bg-primary text-primary-foreground font-medium py-2 px-4 rounded-md;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  @apply bg-primary/90;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.input,
+.select {
+  @apply bg-input text-foreground rounded-md border-transparent focus:border-primary focus:ring-2 focus:ring-primary/30;
+  transition: all 0.2s ease;
+}
+
+.table {
+  @apply w-full border-collapse;
+}
+
+.table th,
+.table td {
+  @apply border-b border-border py-3 px-4;
+}
+
+.table th {
+  @apply bg-muted text-muted-foreground font-semibold text-left;
+}
+
+.modal {
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center;
+}
+
+.modal-content {
+  @apply bg-card p-6 rounded-lg shadow-xl max-w-md w-full;
+  animation: modalSlideUp 0.3s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popover {
+  @apply bg-popover text-popover-foreground rounded-md shadow-md p-4;
+  animation: popoverFade 0.2s ease-out;
+}
+
+@keyframes popoverFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tooltip {
+  @apply bg-accent text-accent-foreground text-sm py-1 px-2 rounded;
+  animation: tooltipFade 0.2s ease-out;
+}
+
+@keyframes tooltipFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/70;
+}
+
+/* Mica effect */
+.mica-bg {
+  @apply bg-card/80 backdrop-blur-md;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Acrylic effect */
+.acrylic-bg {
+  @apply bg-card/60 backdrop-blur-lg;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Windows 11 style toggle switch */
+.toggle-switch {
+  @apply relative inline-block w-12 h-6;
+}
+
+.toggle-switch input {
+  @apply opacity-0 w-0 h-0;
+}
+
+.toggle-slider {
+  @apply absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-secondary rounded-full;
+  transition: 0.4s;
+}
+
+.toggle-slider:before {
+  @apply absolute content-[''] h-5 w-5 left-0.5 bottom-0.5 bg-white rounded-full;
+  transition: 0.4s;
+}
+
+input:checked + .toggle-slider {
+  @apply bg-primary;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .card,
+  .button,
+  .input,
+  .select,
+  .modal-content {
+    @apply rounded-sm;
+  }
+}
+
+.card {
+  @apply bg-card text-card-foreground shadow-md rounded-lg overflow-hidden;
+  transition: all 0.3s ease;
+}
+@media (max-width: 640px) {
+  .card,
+  .button,
+  .input,
+  .select,
+  .modal-content {
+    @apply rounded-sm;
+  }
+}
+
+.hallOfFame-Card {
+  border-radius: 30px;
+  background: #e0e0e0;
+  box-shadow: 15px 15px 30px #bebebe, -15px -15px 30px #ffffff;
+}
+
+
+/** Refuse in html/body full scroll, instead use overflow-x-scroll */
+html, body {
+  overflow: hidden;
+}
+
+
+/** Remix NavLink active styles */
+a.active button {
+  @apply bg-primary text-primary-foreground rounded-md;
+}
+
+a.pending button {
+  @apply bg-yellow-500 text-white rounded-md cursor-not-allowed animate-pulse;
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+a.transitioning button {
+  @apply bg-yellow-500 text-white rounded-md;
+}
+

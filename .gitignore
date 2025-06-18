@@ -1,0 +1,9 @@
+node_modules
+
+/.cache
+/build
+logs
+dev-only
+.env.prod
+.env
+public/uploads

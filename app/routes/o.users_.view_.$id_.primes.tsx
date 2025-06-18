@@ -1,0 +1,258 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { LoaderFunctionArgs } from "@remix-run/node";
+import { Link, useLoaderData } from "@remix-run/react";
+import { formatDateToFrenchWithTime } from "~/utils/dateFormatting";
+import { Card, CardHeader, CardContent, CardTitle } from "~/components/ui/card";
+import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
+import { ArrowLeft, ArrowRight, Briefcase, Users } from "lucide-react";
+import { userService } from "~/services/user.service.server";
+import { bonusCategoryService } from "~/services/bonusCategory.service.server";
+import { CompactUserHeader } from "~/components/users/CompactUserHeader";
+import { Button } from "~/components/ui/button";
+import { IBonusCategory } from "~/core/entities/bonusCategory.entity.server";
+import { motion } from "framer-motion";
+import { PrimeCard } from "~/components/users/PrimeCard";
+import { primeService } from "~/services/prime.service.server";
+import { authService } from "~/services/auth.service.server";
+import { BonusCategoryActions, PrimeActions, UserActions } from "~/core/entities/utils/access-permission";
+/**
+ * This route displays the user's current bonusCategory and the history of bonusCategorys they have held.
+ *
+ * Steps:
+ * 1. Fetch the user by the :id param.
+ * 2. Extract user.currentBonusCategory (ObjectId) and user.bonusCategoriesTraces (Array<{bonusCategory:ObjectId, at:Date}>).
+ * 3. Use bonusCategoryService to fetch the current bonusCategory details.
+ * 4. Use bonusCategoryService to fetch all bonusCategorys from bonusCategoriesTraces.
+ * 5. Render a page showing:
+ *    - The current bonusCategory (highlighted at the top).
+ *    - A history (timeline or list) of all past bonusCategorys with the date the user joined them.
+ */
+
+export async function loader({ params, request }: LoaderFunctionArgs) {
+ const currentLoggedUser = await authService.requireUser(request, {condition: UserActions.ViewOnProfilePrimeInsight});
+  const userId = params.id;
+  if (!userId) {
+    throw new Response("User ID not provided", { status: 400 });
+  }
+
+  // Fetch the user with currentBonusCategory and bonusCategoriesTraces
+  const user = await userService.readOne({
+    id: userId,
+    populate: "avatar,currentBonusCategory,currentPosition",
+  });
+  if (!user) {
+    throw new Response("User not found", { status: 404 });
+  }
+  const primes = await primeService.samples(user);
+
+  const {
+    currentBonusCategory: currentBonusCategoryData,
+    bonusCategoriesTraces,
+  } = user;
+
+  const can =  {
+    view: await authService.can(currentLoggedUser?.id as string, UserActions.View),
+    bonusCategory: {
+      view: await authService.can(currentLoggedUser?.id as string, {any: [BonusCategoryActions.View]}),
+    }
+  }
+
+  // Fetch history bonusCategorys (if any)
+  let historyBonusCategorys: IBonusCategory[] = [];
+  if (bonusCategoriesTraces && bonusCategoriesTraces.length > 0) {
+    const bonusCategoryIds = bonusCategoriesTraces.map(
+      (trace) => trace.bonusCategory
+    );
+    historyBonusCategorys = await bonusCategoryService.readMany(
+      { _id: { $in: bonusCategoryIds } },
+      {
+        sort: { createdAt: -1 },
+      }
+    );
+
+    const bonusCategoriesTracesData = bonusCategoriesTraces.map((trace) => {
+      const bonusCategoryData = historyBonusCategorys.find(
+        (pos) => pos._id.toString() === trace.bonusCategory?.toString()
+      );
+      return { bonusCategoryData, at: trace.at };
+    });
+
+    // Sort the datas by  at date fields
+    bonusCategoriesTracesData.sort(
+      (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()
+    );
+
+    return Response.json({
+      user,
+      currentBonusCategoryData,
+      bonusCategoriesTracesData,
+      primes,
+      can
+    });
+  }
+
+  return Response.json({
+    user,
+    currentBonusCategoryData,
+    bonusCategoriesTracesData: [],
+    primes,
+    can
+  });
+}
+export default function UserBonusCategorysPage() {
+  const { user, currentBonusCategoryData, bonusCategoriesTracesData, primes , can} =
+    useLoaderData<typeof loader>();
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto p-4 space-y-6 max-w-4xl"
+    >
+      
+
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+        className="mb-6"
+      >
+        <CompactUserHeader user={user} can={can}/>
+        <h1 className="text-3xl font-bold mt-4 text-center">
+          Primes & Catégories de prime
+        </h1>
+      </motion.div>
+
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        <Card className="bg-white border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold flex items-center">
+              <Briefcase className="mr-2 h-5 w-5 text-primary" />
+              Catégorie de Prime Actuelle
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {currentBonusCategoryData ? (
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <Badge variant="secondary" className="text-sm px-2 py-1">
+                  Actuelle
+                </Badge>
+                <div>
+                  <p className="font-medium text-lg text-primary">
+                    {can?.bonusCategory?.view ? (
+                      <Link
+                        prefetch="intent"
+                        to={`/o/category-prime/view/${currentBonusCategoryData.id}`}
+                    >
+                      {currentBonusCategoryData.name}
+                    </Link>
+                    ): (
+                      <span>{currentBonusCategoryData.name}</span>  
+                    )}
+                  </p>
+                  <small className="text-sm text-muted-foreground mt-1 flex">
+                    <Users className="mr-2 h-4 w-4" /> Avec{" "}
+                    {currentBonusCategoryData.members.length} autre(s)
+                    personne(s) dans cette catégorie
+                  </small>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Aucune catégorie de prime actuelle.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      <Separator className="my-8" />
+      <CardTitle className="text-xl font-semibold flex items-center">
+          Historiques des Primes
+        </CardTitle>
+      {/* Prime Cards Container */}
+      <div className="flex overflow-x-auto space-x-4 sm:space-x-6 p-2 sm:p-0">
+        {primes.map((prime) => (
+          <div key={prime.id} className="flex-shrink-0 w-80 sm:w-auto mb-2">
+            <PrimeCard prime={prime} />
+          </div>
+        ))}
+      </div>
+      <Separator className="my-8" />
+
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+      >
+        <Card className="bg-white border shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold flex items-center">
+              <ArrowRight className="mr-2 h-5 w-5 text-primary" />
+              Historique des Catégorie de prime
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {bonusCategoriesTracesData.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Aucun historique de catégorie de prime
+              </p>
+            ) : (
+              <ul className="space-y-6">
+                {bonusCategoriesTracesData.map((trace: any, i: number) => (
+                  <motion.li
+                    key={i}
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0 mt-1">
+                        <ArrowRight className="text-primary h-5 w-5" />
+                      </div>
+                      {trace.bonusCategoryData ? (
+                        <div>
+                          <p className="font-medium text-lg text-primary">
+                            {can?.bonusCategory?.view ? (
+                            <Link
+                              prefetch="intent"
+                              to={`/o/category-prime/view/${trace.bonusCategoryData.id}`}
+                            >
+                              {trace.bonusCategoryData.name}
+                            </Link>
+                            ): (
+                              <span>{trace.bonusCategoryData.name}</span>
+                            )}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Accédé le {formatDateToFrenchWithTime(trace.at)}
+                          </p>
+                          <small className="text-sm text-muted-foreground mt-1 flex ">
+                            <Users className="mr-2 h-4 w-4" />
+                            {trace.bonusCategoryData.members.length} autre(s)
+                            personne(s) appartiennent aussi à cette catégorie
+                          </small>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-destructive">
+                          Catégorie introuvable
+                        </p>
+                      )}
+                    </div>
+                    <hr className="text-center" />
+                  </motion.li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
+  );
+}
