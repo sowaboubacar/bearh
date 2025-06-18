@@ -2,17 +2,16 @@
   "name": "bearh",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npx remix dev",
-    "build": "npx remix build",
-    "start": "npx remix-serve build"
+    "dev": "remix dev",
+    "build": "remix build",
+    "start": "remix-serve build"
   },
   "dependencies": {
-    "@remix-run/node": "^1.18.1",
-    "@remix-run/react": "^1.18.1",
-    "@remix-run/serve": "^1.18.1",
+    "@remix-run/node": "^2.16.8",
+    "@remix-run/react": "^2.16.8",
+    "@remix-run/serve": "^2.16.8",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "remix": "^1.19.3"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.16.8",
