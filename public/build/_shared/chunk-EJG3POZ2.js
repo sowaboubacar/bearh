@@ -1,0 +1,1 @@
+function r(t){let n=["B","KB","MB","GB","TB"],e=0;for(;t>=1024&&e<n.length;)t/=1024,e++;return`${t.toFixed(2)} ${n[e]}`}function i(t){if(t===0)return"0 Bytes";let n=1024,e=["Bytes","KB","MB","GB","TB"],o=Math.floor(Math.log(t)/Math.log(n));return parseFloat((t/Math.pow(n,o)).toFixed(2))+" "+e[o]}export{r as a,i as b};

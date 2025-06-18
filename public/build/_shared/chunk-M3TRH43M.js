@@ -1,0 +1,1 @@
+import{a as n}from"/build/_shared/chunk-NVGVVEPD.js";import{b as t}from"/build/_shared/chunk-BBTKOQ57.js";import{e}from"/build/_shared/chunk-UED2Q7CE.js";var r=e(t());function a({className:i,...m}){return(0,r.jsx)("div",{className:n("animate-pulse rounded-md bg-primary/10",i),...m})}export{a};

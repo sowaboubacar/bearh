@@ -1,0 +1,1 @@
+import{a as i,b as n}from"/build/_shared/chunk-BBTKOQ57.js";import{e as t}from"/build/_shared/chunk-UED2Q7CE.js";var r=t(i(),1),c=t(n(),1),a=r.createContext(void 0);function v(e){let o=r.useContext(a);return e||o||"ltr"}export{v as a};
