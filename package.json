@@ -2,9 +2,9 @@
   "name": "bearh",
   "version": "1.0.0",
   "scripts": {
-    "dev": "remix dev",
-    "build": "remix build",
-    "start": "remix-serve build"
+    "dev": "npx remix dev",
+    "build": "npx remix build",
+    "start": "npx remix-serve build"
   },
   "dependencies": {
     "@remix-run/node": "^1.18.1",
