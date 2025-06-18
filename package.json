@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "remix dev",
     "build": "remix build",
-    "start": "remix-serve build"
+     "start": "remix-serve build/index.js"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
