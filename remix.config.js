@@ -5,6 +5,7 @@ module.exports = {
   publicPath: "/build/",
   serverBuildDirectory: "build",
   serverModuleFormat: "cjs",
+  serverPlatform: "node", 
   future: {
     v2_dev: true,
     v2_errorBoundary: true,
