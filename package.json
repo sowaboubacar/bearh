@@ -2,7 +2,7 @@
   "name": "bearh",
   "version": "1.0.0",
   "scripts": {
-    "dev": "npx remix dev",
+    "dev": "remix dev",
     "build": "npx remix build",
     "start": "npx remix-serve build"
   },
